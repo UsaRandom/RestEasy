@@ -10,21 +10,27 @@ namespace RestEasy
 {
 
 public delegate void RestRequestHandler(RestRequest request, RestResponse response);
-public delegate void RestErrorHandler(RestService restService, EventArgs eventArgs);
+public delegate void RestErrorHandler(RestService restService, Exception eventArgs);
 
 public class RestService
 {
 
     public event RestErrorHandler Error;
 
+	public RestService()
+	{
+		IsListening = false;
+		m_requestTree = new RestRequestTree();
+	}
+
+
     public void Register(RestMethod method, string uri, RestRequestHandler handler)
     {
         //check if running
+		if (IsListening)
+			throw new ApplicationException("RestService is listening, cannot register new methods");
 
-        //validate uri
-
-        //place in bucket
-
+        m_requestTree.AddRequestHandler(uri, method, handler);
     }
 
 
@@ -40,35 +46,26 @@ public class RestService
         m_httpServer.Error += OnServerError;
         m_httpServer.Request += OnHttpRequest;
     
+		m_httpServer.Listen();
     }
 
-    void
-    OnHttpRequest(HttpListenerRequest httpRequest, HttpListenerResponse httpResponse)
+    private void OnHttpRequest(HttpListenerRequest httpRequest, HttpListenerResponse httpResponse)
     {
-        throw new NotImplementedException();
+		var url = httpRequest.RawUrl;
+
+		//determine request handler to use
     }
 
-    void
-    OnServerError(RestHttpServer restHttpServer, Exception exception)
+    private void OnServerError(RestHttpServer restHttpServer, Exception exception)
     {
-        throw new NotImplementedException();
+		Error(this, exception);
     }
 
 
-    public bool IsListening
-    {
-        get
-        {
-            return m_isListening;
-        }
-        private set
-        {
-            m_isListening = value;
-        }
-    }
+	public bool IsListening { get; private set; }
 
-    private RestHttpServer m_httpServer;
+	private RestHttpServer m_httpServer;
+	private RestRequestTree m_requestTree;
 
-    private bool m_isListening = false;
 }
 }

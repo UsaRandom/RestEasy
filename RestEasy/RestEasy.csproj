@@ -47,7 +47,11 @@
     <Compile Include="RestResponse.cs" />
     <Compile Include="RestService.cs" />
     <Compile Include="RestStatus.cs" />
+    <Compile Include="Web\IUriRequestHandlerNode.cs" />
+    <Compile Include="Web\NamedUriRequestHandlerNode.cs" />
+    <Compile Include="Web\RestRequestTree.cs" />
     <Compile Include="Web\RestHttpServer.cs" />
+    <Compile Include="Web\UriRequestHandlerNode.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
