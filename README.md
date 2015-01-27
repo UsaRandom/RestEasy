@@ -10,7 +10,8 @@ That is why RestEasy was born. To provide a simple way to prototype RESTful APIs
 
 #### Hello World Example:
 Going to 'http://localhost/Test' in browser will show "Hello World"
-```
+
+```c#
 using RestEasy;
 public class HelloWorld
 {
@@ -27,7 +28,7 @@ public class HelloWorld
 
 #### Api Example:
 
-```
+```c#
 using RestEasy;
 public class Program 
 {
