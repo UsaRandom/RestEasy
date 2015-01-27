@@ -8,9 +8,9 @@ namespace RestEasy
 {
 public enum RestMethod
 {
-	GET,
+    GET,
+    POST,
 	PUT,
-	POST,
 	DELETE
 }
 }
