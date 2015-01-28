@@ -61,7 +61,10 @@ internal class RestHttpServer
 
                         try
                         {
+                            //allow access from anywhere
+                            context.Response.AddHeader("Access-Control-Allow-Origin", "*");
                             Request(context.Request, context.Response);
+
                         }
                         catch (Exception requestException)
                         {

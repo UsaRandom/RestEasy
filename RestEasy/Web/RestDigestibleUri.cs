@@ -21,6 +21,10 @@ internal class RestDigestibleUri
         if (m_nodes.Length == 0)
             return string.Empty;
 
+        if (m_nodes[m_position].Contains('?'))
+        {
+            return m_nodes[m_position].Substring(0, m_nodes[m_position].IndexOf('?'));
+        }
         return m_nodes[m_position];
     }
 

@@ -84,7 +84,8 @@ internal abstract class UriRequestHandlerNode : IUriRequestHandlerNode
 
         foreach (var childNode in ChildNodes)
         {
-            if (childNode.MatchesUriPattern(uri))
+            if (childNode.MatchesUriPattern(uri) && ((childNode is ParameterUriRequestHandlerNode && uri.IsCurrentNodeParameterDefinition) ||
+                                                      childNode is NamedUriRequestHandlerNode && !uri.IsCurrentNodeParameterDefinition))
             {
                 childNode.AddRestRequestHandler(uri, method, handler);
                 return;

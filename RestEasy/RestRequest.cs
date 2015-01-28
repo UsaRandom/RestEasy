@@ -13,6 +13,15 @@ public class RestRequest
 	{
 		m_httpListenerRequest = httpListenerRequest;
         Parameters = parameters;
+
+        foreach (var key in m_httpListenerRequest.QueryString.AllKeys)
+        {
+            if (parameters[key] != null)
+            {
+                throw new Exception("Parameters of same name provided in request");
+            }
+            parameters[key] = m_httpListenerRequest.QueryString[key];
+        }
 	}
 
 
@@ -21,6 +30,7 @@ public class RestRequest
         get;
         private set;
     }
+
 
 	private HttpListenerRequest m_httpListenerRequest;
 }
