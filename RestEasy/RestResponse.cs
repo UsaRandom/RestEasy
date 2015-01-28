@@ -28,6 +28,18 @@ public class RestResponse
         m_httpResponse.OutputStream.Write(buf, 0, buf.Length);
     }
 
+
+    public void SendHtml(string html)
+    {        
+        ErrorOnDoubleHandle();
+
+        m_httpResponse.AddHeader("Content-Type", "text/html");
+
+        byte[] buf = Encoding.UTF8.GetBytes(html);
+        m_httpResponse.ContentLength64 = buf.Length;
+        m_httpResponse.OutputStream.Write(buf, 0, buf.Length);
+    }
+
     public void SendFile(string fileName, byte[] content)
     {
         ErrorOnDoubleHandle();

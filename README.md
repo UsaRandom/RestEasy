@@ -35,13 +35,21 @@ using RestEasy;
 public class Program 
 {
 	public static void Main()
-	{
- 		var service = new RestService();
+    {
+        var service = new RestService();
 
         //http://localhost:8080/
         service.Register(RestMethod.GET, "/", (req, res) =>
         {
             res.Send("Hello World");
+        });
+
+        //http://localhost:8080/home
+        service.Register(RestMethod.GET, "/home", (req, res) =>
+        {
+
+            res.SendHtml("<!DOCTYPE html><html><head><title>hi</title></head><body><h1>Hello World!</h1></body></html>");
+
         });
 
         service.Register(RestMethod.POST, "/user/[name]/update", (req, res) =>
@@ -65,7 +73,7 @@ public class Program
         service.Listen(8080);
 
         Console.ReadKey();
-	}
+    } 
 }
 ```
 
