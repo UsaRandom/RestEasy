@@ -34,10 +34,10 @@ internal interface IUriRequestHandlerNode
 	}
 
 
-	bool MatchesUriPattern(string uri);
+	bool MatchesUriPattern(RestDigestibleUri uri);
 
-	RestRequestHandler GetRestRequestHandler(string uri, RestMethod method);
- 
-	void AddRestRequestHandler(string uri, RestMethod method, RestRequestHandler handler);
+	RestRequestHandler GetRestRequestHandler(RestDigestibleUri uri, RestMethod method, ref RestRequestParameters parameters);
+
+    void AddRestRequestHandler(RestDigestibleUri uri, RestMethod method, RestRequestHandler handler);
 }
 }

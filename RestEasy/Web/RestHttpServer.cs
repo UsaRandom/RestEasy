@@ -24,6 +24,7 @@ internal class RestHttpServer
     public RestHttpServer(int port)
     {
         m_port = port;
+        m_httpListener = new HttpListener();
     }
 
     public void Listen()
@@ -91,24 +92,31 @@ internal class RestHttpServer
         bool usingPortEighty = m_port == 80;
         bool hasElevatedPermissions = HasElevatedPermissions();
 
-        if (hasElevatedPermissions)
+        if (m_port < 1024 && !hasElevatedPermissions)
         {
-            //elevated is easy, just accept everything!
-            m_httpListener.Prefixes.Add("http://*" + (usingPortEighty ? "/" : ":" + m_port + "/"));
+            throw new UnauthorizedAccessException("Ports below 1024 require elevated permissions.");
         }
-        else
-        {
-            //localhost, 127.0.0.1, machine name, and all ip addresses assigned from dns
-            m_httpListener.Prefixes.Add("http://localhost" + (usingPortEighty ? "/" : ":" + m_port + "/"));
-            m_httpListener.Prefixes.Add("http://127.0.0.1" + (usingPortEighty ? "/" : ":" + m_port + "/"));
-            m_httpListener.Prefixes.Add("http://" + Environment.MachineName + (usingPortEighty ? "/" : ":" + m_port + "/"));
 
-            foreach (var ipAddress in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
-            {
-                if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
-                    m_httpListener.Prefixes.Add("http://" + ipAddress.ToString() + (usingPortEighty ? "/" : ":" + m_port + "/"));
-            }
+        /*  Not using wildcards until I can figure out how to get around the  "conflicts with an existing registration on the machine" error*/
+      //  if (hasElevatedPermissions)
+      //  {
+      //      //elevated is easy, just accept everything!
+      //      m_httpListener.Prefixes.Add("http://*" + (usingPortEighty ? "/" : ":" + m_port + "/"));
+     //   }
+       // else
+     //   {
+
+        //localhost, 127.0.0.1, machine name, and all ip addresses assigned from dns
+        m_httpListener.Prefixes.Add("http://localhost" + (usingPortEighty ? "/" : ":" + m_port + "/"));
+        m_httpListener.Prefixes.Add("http://127.0.0.1" + (usingPortEighty ? "/" : ":" + m_port + "/"));
+        m_httpListener.Prefixes.Add("http://" + Environment.MachineName + (usingPortEighty ? "/" : ":" + m_port + "/"));
+
+        foreach (var ipAddress in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
+        {
+            if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
+                m_httpListener.Prefixes.Add("http://" + ipAddress.ToString() + (usingPortEighty ? "/" : ":" + m_port + "/"));
         }
+     //   }
     }
 
 

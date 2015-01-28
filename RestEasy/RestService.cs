@@ -49,20 +49,46 @@ public class RestService
 		m_httpServer.Listen();
     }
 
+	public bool IsListening { get; private set; }
+
     private void OnHttpRequest(HttpListenerRequest httpRequest, HttpListenerResponse httpResponse)
     {
 		var url = httpRequest.RawUrl;
 
-		//determine request handler to use
+        var method = HttpMethodToRestMethod(httpRequest.HttpMethod);
+
+        RestRequestParameters parameters;
+
+        var handler = m_requestTree.GetRequestHandler(url, method, out parameters);
+
+        handler(new RestRequest(httpRequest, parameters), new RestResponse(httpResponse));
     }
 
     private void OnServerError(RestHttpServer restHttpServer, Exception exception)
     {
-		Error(this, exception);
+        if(Error != null)
+		    Error(this, exception);
     }
 
 
-	public bool IsListening { get; private set; }
+    private RestMethod HttpMethodToRestMethod(string method)
+    {
+        Console.WriteLine(method);
+        switch (method)
+        {
+            case "GET":
+                return RestMethod.GET;
+            case "POST":
+                return RestMethod.POST;
+            case "PUT":
+                return RestMethod.PUT;
+            case "DELETE":
+                return RestMethod.DELETE;
+            default:
+                throw new Exception("Bad http method");
+        }
+    }
+
 
 	private RestHttpServer m_httpServer;
 	private RestRequestTree m_requestTree;

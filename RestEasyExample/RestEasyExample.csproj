@@ -4,15 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CD528D11-9995-4889-855F-D6542C84CA89}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{96441E38-143E-4D69-B527-8BA7DC1E9528}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RestEasy</RootNamespace>
-    <AssemblyName>RestEasy</AssemblyName>
+    <RootNamespace>RestEasyExample</RootNamespace>
+    <AssemblyName>RestEasyExample</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -39,23 +41,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RestFileCache.cs" />
-    <Compile Include="RestMethod.cs" />
-    <Compile Include="RestRequest.cs" />
-    <Compile Include="RestRequestParameters.cs" />
-    <Compile Include="RestResponse.cs" />
-    <Compile Include="RestService.cs" />
-    <Compile Include="RestStatus.cs" />
-    <Compile Include="Web\IUriRequestHandlerNode.cs" />
-    <Compile Include="Web\NamedUriRequestHandlerNode.cs" />
-    <Compile Include="Web\ParameterUriRequestHandlerNode.cs" />
-    <Compile Include="Web\RestRequestTree.cs" />
-    <Compile Include="Web\RestHttpServer.cs" />
-    <Compile Include="Web\RestDigestibleUri.cs" />
-    <Compile Include="Web\UriRequestHandlerNode.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RestEasy\RestEasy.csproj">
+      <Project>{cd528d11-9995-4889-855f-d6542c84ca89}</Project>
+      <Name>RestEasy</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

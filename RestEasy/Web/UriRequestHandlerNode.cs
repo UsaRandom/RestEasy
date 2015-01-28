@@ -11,7 +11,7 @@ internal abstract class UriRequestHandlerNode : IUriRequestHandlerNode
 
 	protected UriRequestHandlerNode()
 	{
-		ChildNodes = new List<IUriRequestHandlerNode>();
+        ChildNodes = new List<UriRequestHandlerNode>();
 	}
 
 	public RestRequestHandler HttpGetRequestHandler
@@ -39,9 +39,11 @@ internal abstract class UriRequestHandlerNode : IUriRequestHandlerNode
 	}
 
 
-	public RestRequestHandler GetRestRequestHandler(string uri, RestMethod method)
+	public RestRequestHandler GetRestRequestHandler(RestDigestibleUri uri, RestMethod method, ref RestRequestParameters parameters)
 	{
-		if(IsLastNode(uri))
+        HandleParameters(uri, ref parameters);
+
+		if(uri.IsLastNode)
 		{
 			switch (method)
 			{
@@ -58,32 +60,78 @@ internal abstract class UriRequestHandlerNode : IUriRequestHandlerNode
 			}
 		}
 
-		var nextUriPart = StripUri(uri);
+        uri.NextNode();
 
 		foreach (var childNode in ChildNodes)
 		{
-			if (childNode.MatchesUriPattern(nextUriPart))
+			if (childNode.MatchesUriPattern(uri))
 			{
-				return childNode.GetRestRequestHandler(nextUriPart, method);
+				return childNode.GetRestRequestHandler(uri, method, ref parameters);
 			}
 		}
 
 		return null;
 	}
 
-	public void AddRestRequestHandler(string uri, RestMethod method, RestRequestHandler handler)
+    public void AddRestRequestHandler(RestDigestibleUri uri, RestMethod method, RestRequestHandler handler)
 	{
+        if (uri.IsLastNode)
+        {
+            switch (method)
+            {
+                case RestMethod.GET:
+                    if (HttpGetRequestHandler != null)
+                        throw new Exception("Handler already defined");
+                    HttpGetRequestHandler = handler;
+                    return;
+                case RestMethod.PUT:
+                    if (HttpPutRequestHandler != null)
+                        throw new Exception("Handler already defined");
+                    HttpPutRequestHandler = handler;
+                    return;
+                case RestMethod.POST:
+                    if (HttpPostRequestHandler != null)
+                        throw new Exception("Handler already defined");
+                    HttpPostRequestHandler = handler;
+                    return;
+                case RestMethod.DELETE:
+                    if (HttpDeleteRequestHandler != null)
+                        throw new Exception("Handler already defined");
+                    HttpDeleteRequestHandler = handler;
+                    return;
+                default:
+                    throw new Exception("Unknown REST Method.");
+            }
+        }
 
+        uri.NextNode();
+
+        foreach (var childNode in ChildNodes)
+        {
+            if (childNode.MatchesUriPattern(uri))
+            {
+                childNode.AddRestRequestHandler(uri, method, handler);
+                return;
+            }
+        }
+
+        var newChildNode = uri.IsCurrentNodeParameterDefinition ? (UriRequestHandlerNode) new ParameterUriRequestHandlerNode(uri, method, handler) :
+                                                        (UriRequestHandlerNode) new NamedUriRequestHandlerNode(uri, method, handler);
+
+        ChildNodes.Add(newChildNode);
+
+        ChildNodes = ChildNodes.OrderBy(n => n.GetSearchPriority()).ToList();
 	}
 
-	
-	public abstract bool MatchesUriPattern(string uri);
 
-	protected abstract bool IsLastNode(string uri);
+    public abstract bool MatchesUriPattern(RestDigestibleUri uri);
 
-	protected abstract string StripUri(string uri);
+    protected abstract void HandleParameters(RestDigestibleUri uri, ref RestRequestParameters parameters);
 
-	protected ICollection<IUriRequestHandlerNode> ChildNodes;
+    protected abstract int GetSearchPriority();
+    
+
+    protected ICollection<UriRequestHandlerNode> ChildNodes;
 
 
 }

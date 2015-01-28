@@ -9,11 +9,18 @@ namespace RestEasy
 {
 public class RestRequest
 {
-	internal RestRequest(HttpListenerRequest httpListenerRequest)
+	internal RestRequest(HttpListenerRequest httpListenerRequest, RestRequestParameters parameters)
 	{
 		m_httpListenerRequest = httpListenerRequest;
+        Parameters = parameters;
 	}
 
+
+    public RestRequestParameters Parameters
+    {
+        get;
+        private set;
+    }
 
 	private HttpListenerRequest m_httpListenerRequest;
 }

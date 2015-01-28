@@ -1,0 +1,8 @@
+C:\Users\mstauber\Desktop\GitHub\RestEasy\RestEasyExample\bin\Debug\RestEasyExample.exe.config
+C:\Users\mstauber\Desktop\GitHub\RestEasy\RestEasyExample\bin\Debug\RestEasyExample.exe
+C:\Users\mstauber\Desktop\GitHub\RestEasy\RestEasyExample\bin\Debug\RestEasyExample.pdb
+C:\Users\mstauber\Desktop\GitHub\RestEasy\RestEasyExample\bin\Debug\RestEasy.dll
+C:\Users\mstauber\Desktop\GitHub\RestEasy\RestEasyExample\bin\Debug\RestEasy.pdb
+C:\Users\mstauber\Desktop\GitHub\RestEasy\RestEasyExample\obj\Debug\RestEasyExample.csprojResolveAssemblyReference.cache
+C:\Users\mstauber\Desktop\GitHub\RestEasy\RestEasyExample\obj\Debug\RestEasyExample.exe
+C:\Users\mstauber\Desktop\GitHub\RestEasy\RestEasyExample\obj\Debug\RestEasyExample.pdb
