@@ -20,11 +20,6 @@ internal abstract class UriRequestHandlerNode : IUriRequestHandlerNode
 		set;
 	}
 
-	public RestRequestHandler HttpPutRequestHandler
-	{
-		get;
-		set;
-	}
 
 	public RestRequestHandler HttpPostRequestHandler
 	{
@@ -32,11 +27,6 @@ internal abstract class UriRequestHandlerNode : IUriRequestHandlerNode
 		set;
 	}
 
-	public RestRequestHandler HttpDeleteRequestHandler
-	{
-		get;
-		set;
-	}
 
 
 	public RestRequestHandler GetRestRequestHandler(RestDigestibleUri uri, RestMethod method, ref RestRequestParameters parameters)
@@ -49,12 +39,8 @@ internal abstract class UriRequestHandlerNode : IUriRequestHandlerNode
 			{
 				case RestMethod.GET:
 					return HttpGetRequestHandler;
-				case RestMethod.PUT:
-					return HttpPutRequestHandler;
 				case RestMethod.POST:
 					return HttpPostRequestHandler;
-				case RestMethod.DELETE:
-					return HttpDeleteRequestHandler;
 				default:
 					throw new ApplicationException("Unknown REST method.");
 			}
@@ -84,20 +70,10 @@ internal abstract class UriRequestHandlerNode : IUriRequestHandlerNode
                         throw new Exception("Handler already defined");
                     HttpGetRequestHandler = handler;
                     return;
-                case RestMethod.PUT:
-                    if (HttpPutRequestHandler != null)
-                        throw new Exception("Handler already defined");
-                    HttpPutRequestHandler = handler;
-                    return;
                 case RestMethod.POST:
                     if (HttpPostRequestHandler != null)
                         throw new Exception("Handler already defined");
                     HttpPostRequestHandler = handler;
-                    return;
-                case RestMethod.DELETE:
-                    if (HttpDeleteRequestHandler != null)
-                        throw new Exception("Handler already defined");
-                    HttpDeleteRequestHandler = handler;
                     return;
                 default:
                     throw new Exception("Unknown REST Method.");

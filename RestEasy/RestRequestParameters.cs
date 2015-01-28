@@ -11,14 +11,14 @@ public class RestRequestParameters
 	internal RestRequestParameters()
 	{
 		//only in here thank you
-        m_params = new Dictionary<string, dynamic>();
+        m_params = new Dictionary<string, string>();
 	}
 
-    public dynamic this[string key]
+    public string this[string key]
     {
         get
         {
-            dynamic param;
+            string param;
 
             if (!m_params.TryGetValue(key, out param))
                 return null;
@@ -31,6 +31,6 @@ public class RestRequestParameters
         }
     }
 
-    private IDictionary<string, dynamic> m_params;
+    private IDictionary<string, string> m_params;
 }
 }

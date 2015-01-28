@@ -61,6 +61,7 @@ public class RestService
 
         var handler = m_requestTree.GetRequestHandler(url, method, out parameters);
 
+
         handler(new RestRequest(httpRequest, parameters), new RestResponse(httpResponse));
     }
 
@@ -80,10 +81,6 @@ public class RestService
                 return RestMethod.GET;
             case "POST":
                 return RestMethod.POST;
-            case "PUT":
-                return RestMethod.PUT;
-            case "DELETE":
-                return RestMethod.DELETE;
             default:
                 throw new Exception("Bad http method");
         }

@@ -15,11 +15,6 @@ internal interface IUriRequestHandlerNode
 		get;
 		set;
 	}
-	RestRequestHandler HttpPutRequestHandler
-	{
-		get;
-		set;
-	}
 
 	RestRequestHandler HttpPostRequestHandler
 	{
@@ -27,11 +22,6 @@ internal interface IUriRequestHandlerNode
 		set;
 	}
 
-	RestRequestHandler HttpDeleteRequestHandler
-	{
-		get;
-		set;
-	}
 
 
 	bool MatchesUriPattern(RestDigestibleUri uri);
