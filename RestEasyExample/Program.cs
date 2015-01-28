@@ -24,7 +24,7 @@ class Program
         service.Register(RestMethod.GET, "/home", (req, res) =>
         {
 
-            res.SendHtml("<!DOCTYPE html><html><head><title>hi</title></head><body><h1>Hello World!</h1></body></html>");
+            res.SendHtml("<html><head></head><body><h1>Hello World!</h1></body></html>");
 
         });
 
