@@ -40,13 +40,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RestFileCache.cs" />
     <Compile Include="RestMethod.cs" />
     <Compile Include="RestRequest.cs" />
     <Compile Include="RestRequestParameters.cs" />
     <Compile Include="RestResponse.cs" />
     <Compile Include="RestService.cs" />
-    <Compile Include="RestStatus.cs" />
     <Compile Include="Web\IUriRequestHandlerNode.cs" />
     <Compile Include="Web\NamedUriRequestHandlerNode.cs" />
     <Compile Include="Web\ParameterUriRequestHandlerNode.cs" />

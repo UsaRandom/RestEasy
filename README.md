@@ -9,7 +9,7 @@ That is why RestEasy was born. To provide a simple way to prototype RESTful APIs
 ## Usage
 
 #### Hello World Example:
-Going to 'http://localhost/Test' in browser will show "Hello World"
+Going to 'http://localhost:8080/Test' in browser will show "Hello World"
 
 ```c#
 using RestEasy;
@@ -21,12 +21,14 @@ public class HelloWorld
 
 		rest.Register(RestMethod.GET, "/Test", (req, res) => { res.Send("Hello World"); });
 
-		rest.Listen();
+		rest.Listen(8080);
+
+		Console.ReadKey();
 	}
 }
 ```
 
-#### Api Example:
+#### Example:
 
 ```c#
 using RestEasy;
@@ -34,38 +36,35 @@ public class Program
 {
 	public static void Main()
 	{
-		var rest = new RestService();
-		var fileCache = new RestFileCache(4000); //Max in-memory cache size (kb)
+ 		var service = new RestService();
 
-		//Setup API
-		rest.Register(RestMethod.DELETE, "/object/[id]/delete", (RestRequest request, RestResponse response) => {
+        //http://localhost:8080/
+        service.Register(RestMethod.GET, "/", (req, res) =>
+        {
+            res.Send("Hello World");
+        });
 
-			var id = request.Parameters.GetInt32("id");
-			// or use dynamics: 
-			//dynamic id = request.Parameters["id"]; 
+        service.Register(RestMethod.POST, "/user/[name]/update", (req, res) =>
+        {
+            var name = req.Parameters["name"]; //case sensitive (for no reason whatsoever)
+            //do stuff...
+        });
 
-			//Delete logic here
+        service.Register(RestMethod.GET, "/downloadfile/[name]", (req, res) =>
+        {
+            //path provided from url parameters, example:
+            //http://localhost:8080/downloadfile/Testfile.exe?path=C%3A%5CFile.exe
+            res.SendFile(req.Parameters["name"], System.IO.File.ReadAllBytes(req.Parameters["path"]));
+        });
 
-			response.Send(RestStatus.OK);
-		});
+        service.Error += (serv, error) =>
+        {
+            Console.WriteLine(error);
+        };
 
-		//Static Resources (Code on Demand n' stuff)
-		rest.Register(RestMethod.GET, "/js/codefile.min.js", (RestRequest request, RestResponse response) => {
+        service.Listen(8080);
 
-			//send code file, will be cached based on last time file was written to (write timestamp)
-			response.Send(fileCache.ReadFile(".../js/codefile.min.js"));
-
-		});
-
-		//...
-		//... other api methods
-		//...
-
-		//subscribe to exceptions
-		rest.Error += (s, e) => { Console.WriteLine(e); };
-
-		//start up the rest service on port 8080
-		rest.Listen(8080);
+        Console.ReadKey();
 	}
 }
 ```
@@ -73,8 +72,7 @@ public class Program
 
 ### Todo's
 
- - Tests
- - and everything else :P
+ - Clean Up
 
 License
 ----

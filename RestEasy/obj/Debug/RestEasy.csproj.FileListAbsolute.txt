@@ -1,4 +1,0 @@
-C:\Users\mstauber\Desktop\GitHub\RestEasy\RestEasy\bin\Debug\RestEasy.dll
-C:\Users\mstauber\Desktop\GitHub\RestEasy\RestEasy\bin\Debug\RestEasy.pdb
-C:\Users\mstauber\Desktop\GitHub\RestEasy\RestEasy\obj\Debug\RestEasy.dll
-C:\Users\mstauber\Desktop\GitHub\RestEasy\RestEasy\obj\Debug\RestEasy.pdb
