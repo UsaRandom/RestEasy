@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -22,6 +23,23 @@ public class RestRequest
             }
             parameters[key] = m_httpListenerRequest.QueryString[key];
         }
+	}
+
+
+	public NameValueCollection Headers
+	{
+		get
+		{
+			return m_httpListenerRequest.Headers;
+		}
+	}
+
+	public IPAddress ClientIpAddress
+	{
+		get
+		{
+			return m_httpListenerRequest.RemoteEndPoint.Address;
+		}
 	}
 
 

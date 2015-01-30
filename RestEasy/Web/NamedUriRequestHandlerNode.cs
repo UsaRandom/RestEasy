@@ -26,7 +26,7 @@ internal class NamedUriRequestHandlerNode : UriRequestHandlerNode
         return 0;
     }
 
-    protected override void HandleParameters(RestDigestibleUri uri, ref RestRequestParameters parameters)
+    protected override void HandleParameters(RestDigestibleUri uri, RestRequestParameters parameters)
     {    }
 
     private readonly string m_nodeName;

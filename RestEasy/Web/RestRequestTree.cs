@@ -23,7 +23,7 @@ internal class RestRequestTree
         {
             if (node.MatchesUriPattern(digestibleUrl))
             {
-                return node.GetRestRequestHandler(digestibleUrl, method, ref parameters);
+                return node.GetRestRequestHandler(digestibleUrl, method, parameters);
             }
         }
 

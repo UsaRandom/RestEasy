@@ -29,9 +29,9 @@ internal abstract class UriRequestHandlerNode : IUriRequestHandlerNode
 
 
 
-	public RestRequestHandler GetRestRequestHandler(RestDigestibleUri uri, RestMethod method, ref RestRequestParameters parameters)
+	public RestRequestHandler GetRestRequestHandler(RestDigestibleUri uri, RestMethod method, RestRequestParameters parameters)
 	{
-        HandleParameters(uri, ref parameters);
+        HandleParameters(uri, parameters);
 
 		if(uri.IsLastNode)
 		{
@@ -52,7 +52,7 @@ internal abstract class UriRequestHandlerNode : IUriRequestHandlerNode
 		{
 			if (childNode.MatchesUriPattern(uri))
 			{
-				return childNode.GetRestRequestHandler(uri, method, ref parameters);
+				return childNode.GetRestRequestHandler(uri, method, parameters);
 			}
 		}
 
@@ -103,7 +103,7 @@ internal abstract class UriRequestHandlerNode : IUriRequestHandlerNode
 
     public abstract bool MatchesUriPattern(RestDigestibleUri uri);
 
-    protected abstract void HandleParameters(RestDigestibleUri uri, ref RestRequestParameters parameters);
+    protected abstract void HandleParameters(RestDigestibleUri uri, RestRequestParameters parameters);
 
     protected abstract int GetSearchPriority();
     

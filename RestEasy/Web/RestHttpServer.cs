@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Mime;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Runtime.InteropServices.ComTypes;
+using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +28,12 @@ internal class RestHttpServer
     public RestHttpServer(int port)
     {
         m_port = port;
-        m_httpListener = new HttpListener();
+
+		if(m_port < 1024 && !HasElevatedPermissions())
+		{
+            throw new UnauthorizedAccessException("Ports below 1024 require elevated permissions.");
+		}
+
     }
 
     public void Listen()
@@ -32,8 +41,11 @@ internal class RestHttpServer
         if (!HttpListener.IsSupported)
             throw new NotSupportedException("Windows XP SP2, Server 2003 or later required.");
 
-        if (m_httpListener.IsListening)
+        if (m_httpListener != null && m_httpListener.IsListening)
             throw new ApplicationException("Http listener is already listening.");
+
+		if(!IsPortAvailable())
+			throw new ApplicationException(string.Format("Requested port {0} is already in use.", m_port));
 
         m_httpListener = new HttpListener();
 
@@ -43,10 +55,10 @@ internal class RestHttpServer
     }
 
 
-
-
     private void Run()
     {
+		AppDomain.CurrentDomain.ProcessExit += ProcessExit;
+
         m_httpListener.Start();
 
         ThreadPool.QueueUserWorkItem((o) =>
@@ -89,56 +101,66 @@ internal class RestHttpServer
         });
     }
 
-
     private void SetupPrefixes()
     {
         bool usingPortEighty = m_port == 80;
-        bool hasElevatedPermissions = HasElevatedPermissions();
 
-        if (m_port < 1024 && !hasElevatedPermissions)
+        if (HasElevatedPermissions())
         {
-            throw new UnauthorizedAccessException("Ports below 1024 require elevated permissions.");
+            //elevated is easy, just accept everything!
+            m_httpListener.Prefixes.Add("http://+" + (usingPortEighty ? "/" : ":" + m_port + "/"));
         }
-
-        /*  Not using wildcards until I can figure out how to get around the  "conflicts with an existing registration on the machine" error*/
-      //  if (hasElevatedPermissions)
-      //  {
-      //      //elevated is easy, just accept everything!
-      //      m_httpListener.Prefixes.Add("http://*" + (usingPortEighty ? "/" : ":" + m_port + "/"));
-     //   }
-       // else
-     //   {
-
-        //localhost, 127.0.0.1, machine name, and all ip addresses assigned from dns
-        m_httpListener.Prefixes.Add("http://localhost" + (usingPortEighty ? "/" : ":" + m_port + "/"));
-        m_httpListener.Prefixes.Add("http://127.0.0.1" + (usingPortEighty ? "/" : ":" + m_port + "/"));
-        m_httpListener.Prefixes.Add("http://" + Environment.MachineName + (usingPortEighty ? "/" : ":" + m_port + "/"));
-
-        foreach (var ipAddress in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
+        else
         {
-            if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
-                m_httpListener.Prefixes.Add("http://" + ipAddress.ToString() + (usingPortEighty ? "/" : ":" + m_port + "/"));
+
+			//localhost, 127.0.0.1, machine name, and all ip addresses assigned from dns
+			m_httpListener.Prefixes.Add("http://localhost" + (usingPortEighty ? "/" : ":" + m_port + "/"));
+			m_httpListener.Prefixes.Add("http://127.0.0.1" + (usingPortEighty ? "/" : ":" + m_port + "/"));
+			m_httpListener.Prefixes.Add("http://" + Environment.MachineName + (usingPortEighty ? "/" : ":" + m_port + "/"));
+
+			foreach (var ipAddress in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
+			{
+				if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
+					m_httpListener.Prefixes.Add("http://" + ipAddress.ToString() + (usingPortEighty ? "/" : ":" + m_port + "/"));
+			}
         }
-     //   }
     }
 
 
     private bool HasElevatedPermissions()
     {
-        try
-        {
-            // Wildcard prefixes require elevated permissions.
-            // This is a simple test to check to see if we can use them.
-            var testListener = new HttpListener();
-            testListener.Prefixes.Add("http://*:"+m_port+"/");
-            testListener.Start();
-        }
-        catch(Exception)
-        {
-            return false;
-        }
-        return true;
+        var identity = WindowsIdentity.GetCurrent();
+
+		if(identity == null)
+		{
+			return false;
+		}
+
+        var pricipal = new WindowsPrincipal(identity);
+        return pricipal.IsInRole(WindowsBuiltInRole.Administrator);
     }
+
+
+	private bool IsPortAvailable()
+	{
+		var tcpConnInfoArray = IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpConnections();
+
+		return tcpConnInfoArray.All(tcpi => tcpi.LocalEndPoint.Port != m_port);
+	}
+
+	private void ProcessExit(object sender, EventArgs e)
+	{
+		//close http listener if running
+		if(m_httpListener != null && m_httpListener.IsListening)
+		{
+			try
+			{
+				m_httpListener.Close();
+			}
+			catch { }
+		}
+	}
+
 
 
     private readonly int m_port;

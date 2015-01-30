@@ -29,7 +29,7 @@ internal class ParameterUriRequestHandlerNode: UriRequestHandlerNode
         return 1;
     }
     
-    protected override void HandleParameters(RestDigestibleUri uri, ref RestRequestParameters parameters)
+    protected override void HandleParameters(RestDigestibleUri uri, RestRequestParameters parameters)
     {
         parameters[m_parameterName] = uri.GetCurrentNode();
     }

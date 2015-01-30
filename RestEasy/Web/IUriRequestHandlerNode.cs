@@ -26,7 +26,7 @@ internal interface IUriRequestHandlerNode
 
 	bool MatchesUriPattern(RestDigestibleUri uri);
 
-	RestRequestHandler GetRestRequestHandler(RestDigestibleUri uri, RestMethod method, ref RestRequestParameters parameters);
+	RestRequestHandler GetRestRequestHandler(RestDigestibleUri uri, RestMethod method, RestRequestParameters parameters);
 
     void AddRestRequestHandler(RestDigestibleUri uri, RestMethod method, RestRequestHandler handler);
 }

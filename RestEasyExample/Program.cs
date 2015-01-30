@@ -12,7 +12,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        var service = new RestService();
+     var service = new RestService(8080);
 
         //http://localhost:8080/
         service.Register(RestMethod.GET, "/", (req, res) =>
@@ -46,7 +46,7 @@ class Program
             Console.WriteLine(error);
         };
 
-        service.Listen(8080);
+        service.Listen();
 
         Console.ReadKey();
     } 

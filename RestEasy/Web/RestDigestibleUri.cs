@@ -53,14 +53,6 @@ internal class RestDigestibleUri
         }
     }
 
-    public IList<KeyValuePair<string, dynamic>> GetParameters
-    {
-        get
-        {
-            throw new NotImplementedException();
-        }
-    }
-
 
     private int m_position;
     private string[] m_nodes;

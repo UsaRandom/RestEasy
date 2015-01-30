@@ -26,6 +26,7 @@ public class RestResponse
         byte[] buf = Encoding.UTF8.GetBytes(content);
         m_httpResponse.ContentLength64 = buf.Length;
         m_httpResponse.OutputStream.Write(buf, 0, buf.Length);
+
     }
 
 
@@ -57,6 +58,7 @@ public class RestResponse
     {
         if (m_handled)
             throw new Exception("Response already handled!");
+		m_handled = true;
     }
 
     private HttpListenerResponse m_httpResponse;

@@ -17,10 +17,16 @@ public class RestService
 
     public event RestErrorHandler Error;
 
-	public RestService()
+	public RestService(int port)
 	{
 		IsListening = false;
+		IgnoreFaviconRequests = false;
 		m_requestTree = new RestRequestTree();
+
+        m_httpServer = new RestHttpServer(port);
+
+        m_httpServer.Error += OnServerError;
+        m_httpServer.Request += OnHttpRequest;
 	}
 
 
@@ -34,33 +40,44 @@ public class RestService
     }
 
 
-    public void Listen(int port)
+    public void Listen()
     {
         if (IsListening)
             throw new ApplicationException("RestService is already listening");
 
         IsListening = true;
 
-        m_httpServer = new RestHttpServer(port);
-
-        m_httpServer.Error += OnServerError;
-        m_httpServer.Request += OnHttpRequest;
     
 		m_httpServer.Listen();
     }
 
 	public bool IsListening { get; private set; }
 
+	public bool IgnoreFaviconRequests
+	{
+		get;
+		set;
+	}
+
     private void OnHttpRequest(HttpListenerRequest httpRequest, HttpListenerResponse httpResponse)
     {
 		var url = httpRequest.RawUrl;
 
-        var method = HttpMethodToRestMethod(httpRequest.HttpMethod);
-
+		if(url == FAVICON_URL && IgnoreFaviconRequests)
+			return;
+		
         RestRequestParameters parameters;
+
+        var method = HttpMethodToRestMethod(httpRequest.HttpMethod);
 
         var handler = m_requestTree.GetRequestHandler(url, method, out parameters);
 
+		if (handler == null)
+		{
+			//resource not found
+			httpResponse.StatusCode = 404;
+			return;
+		}
 
         handler(new RestRequest(httpRequest, parameters), new RestResponse(httpResponse));
     }
@@ -74,7 +91,6 @@ public class RestService
 
     private RestMethod HttpMethodToRestMethod(string method)
     {
-        Console.WriteLine(method);
         switch (method)
         {
             case "GET":
@@ -90,5 +106,6 @@ public class RestService
 	private RestHttpServer m_httpServer;
 	private RestRequestTree m_requestTree;
 
+	private const string FAVICON_URL = "/favicon.ico";
 }
 }
