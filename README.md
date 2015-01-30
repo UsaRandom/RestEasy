@@ -17,11 +17,11 @@ public class HelloWorld
 {
 	public static void Main()
 	{
-		var rest = new RestService();
+		var rest = new RestService(8080);
 
 		rest.Register(RestMethod.GET, "/Test", (req, res) => { res.Send("Hello World"); });
 
-		rest.Listen(8080);
+		rest.Listen();
 
 		Console.ReadKey();
 	}
