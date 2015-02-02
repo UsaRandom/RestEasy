@@ -61,7 +61,7 @@ class Program
         //listen to errors
         restService.Error += (service, error) => Console.WriteLine(error);
 
-        //http://localhost:8080/
+        //http://localhost/
         restService.Register(RestMethod.GET, "/", (req, res) =>
         {
             IRestResourceFile index = resourceCache.FetchFile("index.html");
