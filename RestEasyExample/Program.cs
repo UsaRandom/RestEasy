@@ -1,54 +1,83 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using RestEasy;
-using System.IO;
+using RestEasy.IO;
 
 namespace RestEasyExample
 {
 class Program
 {
-    static void Main(string[] args)
+	private static RestResourceCache resourceCache;
+
+    static void Main()
     {
-     var service = new RestService(8080);
+        resourceCache = new RestResourceCache(40000); //40mb in-memory cache
 
-        //http://localhost:8080/
-        service.Register(RestMethod.GET, "/", (req, res) =>
-        {
-            res.Send("Hello World");
-        });
+		//register individual files (relative to executable path)
+		resourceCache.RegisterFile("index.html");
+		
+		//register all files in folder
+		resourceCache.RegisterFolder("js");
+		resourceCache.RegisterFolder("img");
 
-        //http://localhost:8080/home
-        service.Register(RestMethod.GET, "/home", (req, res) =>
-        {
+		//register all files in folder and all sub folders
+		resourceCache.RegisterFolderAndSubFolders("css");
+		
 
-            res.SendHtml("<html><head></head><body><h1>Hello World!</h1></body></html>");
+		var restService = new RestService(80);
 
-        });
+		//listen to errors
+        restService.Error += (service, error) => Console.WriteLine(error);
 
-        service.Register(RestMethod.POST, "/user/[name]/update", (req, res) =>
-        {
-            var name = req.Parameters["name"]; //case sensitive (for no reason whatsoever)
-            //do stuff...
-        });
 
-        service.Register(RestMethod.GET, "/downloadfile/[name]", (req, res) =>
-        {
-            //path provided from url parameters, example:
-            //http://localhost:8080/downloadfile/Testfile.exe?path=C%3A%5CFile.exe
-            res.SendFile(req.Parameters["name"], System.IO.File.ReadAllBytes(req.Parameters["path"]));
-        });
+		//http://localhost:8080/
+        restService.Register(RestMethod.GET, "/", (req, res) =>
+		{
+			IRestResourceFile index = resourceCache.FetchFile("index.html");
 
-        service.Error += (serv, error) =>
-        {
-            Console.WriteLine(error);
-        };
+			//Send index file
+			res.Send(index);
+		});
 
-        service.Listen();
+		//send off static files (only from these folders)
+        restService.Register(RestMethod.GET, "/js/*", StaticFileRequestHandler);
+        restService.Register(RestMethod.GET, "/img/*", StaticFileRequestHandler);
+        restService.Register(RestMethod.GET, "/css/*", StaticFileRequestHandler);
+
+		//parameters
+		restService.Register(RestMethod.GET, "/user/[username]", (req, res) => {
+
+			//http://localhost/users/RestEasyUser?token=4920cfjh30dk4n
+			string username = req.Parameters["username"];
+
+			string token = req.Parameters["token"];
+
+			//... do stuff
+
+			//sends "You entered a username of : RestEasyUser. With a token of : 4920cfjh30dk4n"
+			res.Send("You entered a username of : " + username +". With a token of : "+ token);
+		});
+
+
+		restService.Register(RestMethod.POST, "/user/[username]", (req, res) => {
+			string username = req.Parameters["username"];
+
+			//delete username
+		
+			res.Send(); 
+		});
+
+        restService.Listen();
 
         Console.ReadKey();
-    } 
+
+    }
+
+
+	private static void StaticFileRequestHandler(RestRequest request, RestResponse response)
+	{
+		var file = resourceCache.FetchFile(request.Url);
+		response.Send(file);
+	}
+
 }
 }

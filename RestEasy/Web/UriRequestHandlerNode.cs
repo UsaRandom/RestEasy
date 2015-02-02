@@ -33,7 +33,7 @@ internal abstract class UriRequestHandlerNode : IUriRequestHandlerNode
 	{
         HandleParameters(uri, parameters);
 
-		if(uri.IsLastNode)
+		if(uri.IsLastNode || this is WildCardUriRequestHandlerNode)
 		{
 			switch (method)
 			{
@@ -61,7 +61,7 @@ internal abstract class UriRequestHandlerNode : IUriRequestHandlerNode
 
     public void AddRestRequestHandler(RestDigestibleUri uri, RestMethod method, RestRequestHandler handler)
 	{
-        if (uri.IsLastNode)
+        if (uri.IsLastNode || this is WildCardUriRequestHandlerNode)
         {
             switch (method)
             {
@@ -92,8 +92,14 @@ internal abstract class UriRequestHandlerNode : IUriRequestHandlerNode
             }
         }
 
-        var newChildNode = uri.IsCurrentNodeParameterDefinition ? (UriRequestHandlerNode) new ParameterUriRequestHandlerNode(uri, method, handler) :
-                                                        (UriRequestHandlerNode) new NamedUriRequestHandlerNode(uri, method, handler);
+        UriRequestHandlerNode newChildNode;
+		
+		if (uri.IsCurrentNodeParameterDefinition)
+			newChildNode = new ParameterUriRequestHandlerNode(uri, method, handler);
+		else if (uri.IsWildCardNodeDefinition)
+			newChildNode = new WildCardUriRequestHandlerNode(uri, method, handler);
+		else
+			newChildNode = new NamedUriRequestHandlerNode(uri, method, handler);
 
         ChildNodes.Add(newChildNode);
 

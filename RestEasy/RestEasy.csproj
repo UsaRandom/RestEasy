@@ -57,6 +57,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IO\CachedRestResourceFile.cs" />
+    <Compile Include="IO\IRestResourceFile.cs" />
+    <Compile Include="IO\LocalRestResourceFile.cs" />
+    <Compile Include="IO\RestResourceCache.cs" />
+    <Compile Include="IO\RestResourceFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestMethod.cs" />
     <Compile Include="RestRequest.cs" />
@@ -70,6 +75,7 @@
     <Compile Include="Web\RestHttpServer.cs" />
     <Compile Include="Web\RestDigestibleUri.cs" />
     <Compile Include="Web\UriRequestHandlerNode.cs" />
+    <Compile Include="Web\WildCardUriReuqestHandlerNode.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

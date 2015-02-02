@@ -53,7 +53,16 @@ internal class RestDigestibleUri
         }
     }
 
+	public bool IsWildCardNodeDefinition
+	{
+		get
+		{
+			return GetCurrentNode() == ASTRISK;
+		}
+	}
 
+	
+	private const string ASTRISK = "*";
     private int m_position;
     private string[] m_nodes;
 }
