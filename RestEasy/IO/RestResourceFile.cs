@@ -20,7 +20,11 @@ public abstract class RestResourceFile : IRestResourceFile
 	{
 		SetMimeTypeAndDetermineBinaryOrText(Path.GetExtension(FileLocation).Remove(0, 1));
 		FileName = Path.GetFileName(FileLocation);
-		LastLoadDateTimeUTC = DateTime.MinValue;
+
+        var fileInfo = new FileInfo(FileLocation);
+        fileInfo.Refresh();
+        LastLoadDateTimeUTC = fileInfo.LastWriteTimeUtc;
+
 	}
 
 	private void SetMimeTypeAndDetermineBinaryOrText(string extension)
@@ -119,8 +123,10 @@ public abstract class RestResourceFile : IRestResourceFile
 	{
 		get
 		{
-			
-			return new FileInfo(FileLocation).Length;
+
+            var fileInfo = new FileInfo(FileLocation);
+            fileInfo.Refresh();
+            return fileInfo.Length;
 
 		}
 	}
@@ -135,9 +141,12 @@ public abstract class RestResourceFile : IRestResourceFile
 	{
 		get
 		{
-			return new FileInfo(FileLocation).LastWriteTimeUtc;
+            var fileInfo = new FileInfo(FileLocation);
+            fileInfo.Refresh();
+            return fileInfo.LastWriteTimeUtc;
 		}
 	}
+
 
 	protected DateTime LastLoadDateTimeUTC
 	{

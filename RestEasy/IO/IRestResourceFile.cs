@@ -41,6 +41,7 @@ public interface IRestResourceFile
 	{
 		get;
 	}
+
 	string FileLocation
 	{
 		get;
