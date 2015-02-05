@@ -6,6 +6,7 @@ using System.Net.Mime;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
@@ -25,15 +26,16 @@ internal class RestHttpServer
     
 
 
-    public RestHttpServer(int port)
+    public RestHttpServer(int port, bool useSsl)
     {
         m_port = port;
+		m_useSsl = useSsl;
+
 
 		if(m_port < 1024 && !HasElevatedPermissions())
 		{
             throw new UnauthorizedAccessException("Ports below 1024 require elevated permissions.");
 		}
-
     }
 
     public void Listen()
@@ -46,6 +48,8 @@ internal class RestHttpServer
 
 		if(!IsPortAvailable())
 			throw new ApplicationException(string.Format("Requested port {0} is already in use.", m_port));
+
+
 
         m_httpListener = new HttpListener();
 
@@ -104,24 +108,25 @@ internal class RestHttpServer
     private void SetupPrefixes()
     {
         bool usingPortEighty = m_port == 80;
+		var protocol =  GetProtocol();
 
         if (HasElevatedPermissions())
         {
             //elevated is easy, just accept everything!
-            m_httpListener.Prefixes.Add("http://+" + (usingPortEighty ? "/" : ":" + m_port + "/"));
+            m_httpListener.Prefixes.Add(protocol + "://+" + (usingPortEighty ? "/" : ":" + m_port + "/"));
         }
         else
         {
 
 			//localhost, 127.0.0.1, machine name, and all ip addresses assigned from dns
-			m_httpListener.Prefixes.Add("http://localhost" + (usingPortEighty ? "/" : ":" + m_port + "/"));
-			m_httpListener.Prefixes.Add("http://127.0.0.1" + (usingPortEighty ? "/" : ":" + m_port + "/"));
-			m_httpListener.Prefixes.Add("http://" + Environment.MachineName + (usingPortEighty ? "/" : ":" + m_port + "/"));
+			m_httpListener.Prefixes.Add(protocol + "://localhost" + (usingPortEighty ? "/" : ":" + m_port + "/"));
+			m_httpListener.Prefixes.Add(protocol + "://127.0.0.1" + (usingPortEighty ? "/" : ":" + m_port + "/"));
+			m_httpListener.Prefixes.Add(protocol + "://" + Environment.MachineName + (usingPortEighty ? "/" : ":" + m_port + "/"));
 
 			foreach (var ipAddress in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
 			{
 				if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
-					m_httpListener.Prefixes.Add("http://" + ipAddress.ToString() + (usingPortEighty ? "/" : ":" + m_port + "/"));
+					m_httpListener.Prefixes.Add(protocol + "://" + ipAddress.ToString() + (usingPortEighty ? "/" : ":" + m_port + "/"));
 			}
         }
     }
@@ -162,7 +167,14 @@ internal class RestHttpServer
 	}
 
 
+	private string GetProtocol()
+	{
+		return m_useSsl ? HTTPS : HTTP;
+	}
 
+	private const string HTTPS = "https";
+	private const string HTTP = "http";
+	private readonly bool m_useSsl;
     private readonly int m_port;
     private HttpListener m_httpListener;
 }

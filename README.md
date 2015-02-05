@@ -18,7 +18,8 @@ public class HelloWorld
 {
 	public static void Main()
 	{
-		var rest = new RestService(8080);
+		//don't use ssl
+		var rest = new RestService(8080, false);
 
 		rest.Register(RestMethod.GET, "/Test", (req, res) => { res.Send("Hello World"); });
 
@@ -56,12 +57,13 @@ class Program
         //register all files in folder and all sub folders
         resourceCache.RegisterFolderAndSubFolders("css");
         
-        var restService = new RestService(80);
+        //use ssl
+        var restService = new RestService(80, true);
 
         //listen to errors
         restService.Error += (service, error) => Console.WriteLine(error);
 
-        //http://localhost/
+        //https://example.com/
         restService.Register(RestMethod.GET, "/", (req, res) =>
         {
             IRestResourceFile index = resourceCache.FetchFile("index.html");
@@ -78,7 +80,7 @@ class Program
         //parameters
         restService.Register(RestMethod.GET, "/user/[username]", (req, res) => {
 
-            //http://localhost/users/RestEasyUser?token=4920cfjh30dk4n
+            //https://example.com/users/RestEasyUser?token=4920cfjh30dk4n
             string username = req.Parameters["username"];
 
             string token = req.Parameters["token"];

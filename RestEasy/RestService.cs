@@ -17,13 +17,13 @@ public class RestService
 
     public event RestErrorHandler Error;
 
-	public RestService(int port)
+	public RestService(int port, bool useSsl)
 	{
 		IsListening = false;
 		IgnoreFaviconRequests = false;
 		m_requestTree = new RestRequestTree();
 
-        m_httpServer = new RestHttpServer(port);
+        m_httpServer = new RestHttpServer(port, useSsl);
 
         m_httpServer.Error += OnServerError;
         m_httpServer.Request += OnHttpRequest;
