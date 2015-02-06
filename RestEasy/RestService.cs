@@ -9,26 +9,49 @@ using System.Threading.Tasks;
 namespace RestEasy
 {
 
+public delegate void RestInfoMessageHandler(RestService restService, string message);
 public delegate void RestRequestHandler(RestRequest request, RestResponse response);
-public delegate void RestErrorHandler(RestService restService, Exception eventArgs);
+public delegate void RestErrorHandler(RestService restService, Exception exception);
 
 public class RestService
 {
-
     public event RestErrorHandler Error;
+    public event RestInfoMessageHandler Message;
 
-	public RestService(int port, bool useSsl)
+	public RestService(int port, bool useSsl, params string[] domains)
 	{
 		IsListening = false;
 		IgnoreFaviconRequests = false;
 		m_requestTree = new RestRequestTree();
+        UsingSsl = useSsl;
 
-        m_httpServer = new RestHttpServer(port, useSsl);
+        m_httpServer = new RestHttpServer(port, useSsl, domains);
 
+        m_httpServer.Message += OnServerMessage;
         m_httpServer.Error += OnServerError;
         m_httpServer.Request += OnHttpRequest;
 	}
 
+    /*
+    //TODO: need a decent way for developers to provide certificates...
+    public string SslCertificateFriendlyName
+    {
+        get
+        {
+            return m_httpServer.SslCertificateFriendlyName;
+        }
+        set
+        {
+            m_httpServer.SslCertificateFriendlyName = value;
+        }
+    }
+    */
+
+    public bool UsingSsl
+    {
+        get;
+        private set;
+    }
 
     public void Register(RestMethod method, string uri, RestRequestHandler handler)
     {
@@ -37,6 +60,8 @@ public class RestService
 			throw new ApplicationException("RestService is listening, cannot register new methods");
 
         m_requestTree.AddRequestHandler(uri, method, handler);
+
+        SendMessage("[" + method + "] Registered Uri: " + uri);
     }
 
 
@@ -47,8 +72,10 @@ public class RestService
 
         IsListening = true;
 
-    
-		m_httpServer.Listen();
+
+        m_httpServer.Listen();
+
+        SendMessage("Rest Service started listening.");
     }
 
 	public bool IsListening { get; private set; }
@@ -88,6 +115,16 @@ public class RestService
 		    Error(this, exception);
     }
 
+    private void OnServerMessage(RestHttpServer restHttpServer, string message)
+    {
+       SendMessage(message);
+    }
+
+    private void SendMessage(string message)
+    {
+        if (Message != null && message != null)
+            Message(this, message);
+    }
 
     private RestMethod HttpMethodToRestMethod(string method)
     {
@@ -101,7 +138,6 @@ public class RestService
                 throw new Exception("Bad http method");
         }
     }
-
 
 	private RestHttpServer m_httpServer;
 	private RestRequestTree m_requestTree;

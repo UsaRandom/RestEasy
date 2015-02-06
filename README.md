@@ -57,13 +57,16 @@ class Program
         //register all files in folder and all sub folders
         resourceCache.RegisterFolderAndSubFolders("css");
         
-        //use ssl
-        var restService = new RestService(80, true);
+        var restService = new RestService(80, false);
+
+        //listen to messages
+        restService.Message += (service, message) => Console.WriteLine(message);
 
         //listen to errors
         restService.Error += (service, error) => Console.WriteLine(error);
 
-        //https://example.com/
+
+        //http://localhost/
         restService.Register(RestMethod.GET, "/", (req, res) =>
         {
             IRestResourceFile index = resourceCache.FetchFile("index.html");
@@ -80,7 +83,7 @@ class Program
         //parameters
         restService.Register(RestMethod.GET, "/user/[username]", (req, res) => {
 
-            //https://example.com/users/RestEasyUser?token=4920cfjh30dk4n
+            //http://localhost/users/RestEasyUser?token=4920cfjh30dk4n
             string username = req.Parameters["username"];
 
             string token = req.Parameters["token"];
@@ -90,6 +93,7 @@ class Program
             //sends "You entered a username of : RestEasyUser. With a token of : 4920cfjh30dk4n"
             res.Send("You entered a username of : " + username +". With a token of : "+ token);
         });
+
 
         restService.Register(RestMethod.POST, "/user/[username]", (req, res) => {
             string username = req.Parameters["username"];
@@ -105,11 +109,13 @@ class Program
 
     }
 
+
     private static void StaticFileRequestHandler(RestRequest request, RestResponse response)
     {
         var file = resourceCache.FetchFile(request.Url);
         response.Send(file);
     }
+
 }
 }
 ```

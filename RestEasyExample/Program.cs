@@ -22,14 +22,16 @@ class Program
 		//register all files in folder and all sub folders
 		resourceCache.RegisterFolderAndSubFolders("css");
 		
+		var restService = new RestService(80, false);
 
-		var restService = new RestService(80);
+        //listen to messages
+        restService.Message += (service, message) => Console.WriteLine(message);
 
 		//listen to errors
         restService.Error += (service, error) => Console.WriteLine(error);
 
 
-		//http://localhost:8080/
+        //http://localhost/
         restService.Register(RestMethod.GET, "/", (req, res) =>
 		{
 			IRestResourceFile index = resourceCache.FetchFile("index.html");
@@ -46,7 +48,7 @@ class Program
 		//parameters
 		restService.Register(RestMethod.GET, "/user/[username]", (req, res) => {
 
-			//http://localhost/users/RestEasyUser?token=4920cfjh30dk4n
+            //http://localhost/users/RestEasyUser?token=4920cfjh30dk4n
 			string username = req.Parameters["username"];
 
 			string token = req.Parameters["token"];

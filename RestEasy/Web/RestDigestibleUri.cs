@@ -45,6 +45,7 @@ internal class RestDigestibleUri
         }
     }
 
+
     public bool IsCurrentNodeParameterDefinition
     {
         get
@@ -60,6 +61,27 @@ internal class RestDigestibleUri
 			return GetCurrentNode() == ASTRISK;
 		}
 	}
+
+    public bool ContainsWildCardNodeDefinition
+    {
+        get
+        {
+            if (m_nodes == null || m_nodes.Length == 0)
+                return false;
+
+            for (int i = 0; i < m_nodes.Length; i++)
+            {
+
+                if (m_nodes[i].Contains('?'))
+                {
+                    if(m_nodes[i].Substring(0, m_nodes[i].IndexOf('?')) == ASTRISK)
+                        return true;
+                }
+            }
+            return false;
+               
+        }
+    }
 
 	
 	private const string ASTRISK = "*";
