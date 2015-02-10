@@ -41,8 +41,8 @@ public class RestResponse
     public void Send(string content)
     {
         ErrorOnDoubleHandle();
-
-        m_httpResponse.AddHeader("Content-Type", "text/plain");
+		if(string.IsNullOrEmpty(m_httpResponse.Headers["Content-Type"]))
+			m_httpResponse.AddHeader("Content-Type", "text/plain");
 		m_httpResponse.StatusCode = 200;
 
         byte[] buf = Encoding.UTF8.GetBytes(content);
